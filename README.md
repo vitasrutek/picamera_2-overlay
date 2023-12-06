@@ -1,8 +1,8 @@
 # picamera_2-overlay
-overlay for live streaming from RaspberryPi camera on Bullseye
+overlay for live streaming from RaspberryPi camera on Bookworm.
 
 # picamera-overlay
-Simple text (or whatever) overlay for picamera web stream (tested on Raspberry OS Bullseye (64bit) with libcamera)
+Simple text (or whatever) overlay for picamera web stream (tested on Raspberry OS Bookworm (32bit) with libcamera on RaspberryPi Zero2)
 
 Due to my limited skills in Python and PHP, any better programmer can do it better. But this is probably better solution than annotationtext directly from picamera.
 Overlay is realized with picamera web stream and side running PHP for showing wanted values (for my purpose uptime, temp sensor and CPU temp). Next choise is link for capturing JPG photo in day or night.
@@ -19,26 +19,36 @@ sudo apt update
 sudo apt install python3
 ```
 ```
-sudo apt install lighttpd
-sudo lighttpd-enable-mod userdir
-sudo service lighttpd reload
+sudo apt install python3 nginx php-cgi php8.2-fpm
+```
+Next you should edit nginx config like this (add index.php, uncomment php stuff):
+```
+sudo nano /etc/nginx/sites-available/default
 ```
 ```
-sudo apt install php7.4 php7.4-cgi php7.4-cli php7.4-fpm
-sudo lighttpd-enable-mod fastcgi fastcgi-php
-sudo service lighttpd reload
-```
-After these steps everything should be ready.
+server {
+  listen 80 default_server;
+  listen [::]:80 default_server;
+  root /var/www/html;
 
-Next you must allow www-data user to run SUDO commands (stop and start camera.service for take static picture in full resolution)
-```
-sudo visudo
-```
-and add this
-```
-www-data   ALL=NOPASSWD: /var/www/html/photo-day.sh, /var/www/html/photo-night.sh
-```
+  index index.php index.html index.htm index.nginx-debian.html;
 
+  server_name _;
+
+  location / {
+    try_files $uri $uri/ =404;
+  }
+
+  location ~ \.php$ {
+    include snippets/fastcgi-php.conf;
+    fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+  }
+
+  location ~ /\.ht {
+    deny all;
+  }
+}
+```
 Create picamera service (name camera.service)
 ```
 sudo nano /etc/systemd/system/camera.service
@@ -61,18 +71,20 @@ sudo systemctl enable camera.service
 sudo systemctl start camera.service
 ```
 
-and service for HTML:
-```
-[Unit]
-Description=Spousteni HTML
+After these steps everything should be almost ready.
+Check service status for nginx and php8.2 and camera to be sure everything works fine.
 
-[Service]
-ExecStart=python3 /home/pi/html.py
-
-[Install]
-WantedBy=multi-user.target
+Next you must allow www-data user to run SUDO commands (stop and start camera.service for take static picture in full resolution)
 ```
-After this you can now copy  all files to /var/www/html (photo*, index.php, temperature*, uptime.sh).
+sudo visudo
+```
+and add this
+```
+www-data   ALL=NOPASSWD: /var/www/html/photo-day.sh, /var/www/html/photo-night.sh
+```
+
+
+After this you can now copy  all files to /var/www/html (photo*, index.php, temperature*, uptime.sh) and for .sh files make chmod +x.
 
 Note that to edit all nessecary files for IP address change.
 
