@@ -17,7 +17,7 @@ sudo apt install python3
 ```
 sudo apt install -y python3-picamera2 --no-install-recommends
 ```
-```
+
 Create picamera service (name camera.service)
 ```
 sudo nano /etc/systemd/system/camera.service
