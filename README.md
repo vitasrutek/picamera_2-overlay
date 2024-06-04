@@ -2,16 +2,12 @@
 overlay for live streaming from RaspberryPi camera on Bookworm.
 
 # picamera-overlay
-Simple text (or whatever) overlay for picamera web stream (tested on Raspberry OS Bookworm (32bit) with libcamera on RaspberryPi Zero2)
+Simple text (or whatever) overlay for picamera web stream (tested on Raspberry OS Bookworm (64bit) with libcamera on RaspberryPi)
 
-Due to my limited skills in Python and PHP, any better programmer can do it better. But this is probably better solution than annotationtext directly from picamera.
-Overlay is realized with picamera web stream and side running PHP for showing wanted values (for my purpose uptime, temp sensor and CPU temp). Next choise is link for capturing JPG photo in day or night.
-In the end, there will be 2 services - one for camera streaming and one for HTML overlay.
+Now no need to use Nginx or Apache, everything is ruled by Python :)
 
 ![screenshot](https://github.com/vitasrutek/picamera-overlay/blob/main/screenshot.PNG)
 
-First of all you need picamera installed - https://picamera.readthedocs.io/en/release-1.13/install.html
-Then you have to install Lighttpd (but Nginx is probably better) and PHP.
 ```
 sudo apt update
 ```
@@ -19,35 +15,8 @@ sudo apt update
 sudo apt install python3
 ```
 ```
-sudo apt install python3 nginx php-cgi php8.2-fpm
+sudo apt install -y python3-picamera2 --no-install-recommends
 ```
-Next you should edit nginx config like this (add index.php, uncomment php stuff):
-```
-sudo nano /etc/nginx/sites-available/default
-```
-```
-server {
-  listen 80 default_server;
-  listen [::]:80 default_server;
-  root /var/www/html;
-
-  index index.php index.html index.htm index.nginx-debian.html;
-
-  server_name _;
-
-  location / {
-    try_files $uri $uri/ =404;
-  }
-
-  location ~ \.php$ {
-    include snippets/fastcgi-php.conf;
-    fastcgi_pass unix:/run/php/php8.1-fpm.sock;
-  }
-
-  location ~ /\.ht {
-    deny all;
-  }
-}
 ```
 Create picamera service (name camera.service)
 ```
@@ -60,7 +29,7 @@ and add this (or copy prepared file):
 Description=Service for PiCamera
 
 [Service]
-ExecStart=python3 /home/pi/camera.py
+ExecStart=python3 /home/pi/picam.py
 
 [Install]
 WantedBy=multi-user.target
@@ -70,6 +39,9 @@ and activate service:
 sudo systemctl enable camera.service
 sudo systemctl start camera.service
 ```
+
+# Bottom in dev...
+
 
 After these steps everything should be almost ready.
 Check service status for nginx and php8.2 and camera to be sure everything works fine.
