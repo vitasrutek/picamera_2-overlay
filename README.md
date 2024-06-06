@@ -4,9 +4,9 @@ overlay for live streaming from RaspberryPi camera on Bookworm.
 # picamera-overlay
 Simple text (or whatever) overlay for picamera web stream (tested on Raspberry OS Bookworm (64bit) with libcamera on RaspberryPi)
 
-Now no need to use Nginx or Apache, everything is ruled by Python :)
+Now no need to use Nginx or Apache, everything is driven by Python :)
 
-![screenshot](https://github.com/vitasrutek/picamera-overlay/blob/main/screenshot.PNG)
+![screenshot](https://github.com/vitasrutek/picamera-overlay/blob/v2/screen.PNG)
 
 ```
 sudo apt update
