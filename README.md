@@ -2,92 +2,69 @@
 overlay for live streaming from RaspberryPi camera on Bookworm.
 
 # picamera-overlay
-Simple text (or whatever) overlay for picamera web stream (tested on Raspberry OS Bookworm (32bit) with libcamera on RaspberryPi Zero2)
+Simple text (or whatever) overlay for picamera web stream (tested on Raspberry OS Bookworm (64bit) with libcamera on RaspberryPi)
 
-Due to my limited skills in Python and PHP, any better programmer can do it better. But this is probably better solution than annotationtext directly from picamera.
-Overlay is realized with picamera web stream and side running PHP for showing wanted values (for my purpose uptime, temp sensor and CPU temp). Next choise is link for capturing JPG photo in day or night.
-In the end, there will be 2 services - one for camera streaming and one for HTML overlay.
+Now no need to use Nginx or Apache, everything is driven by Python :)
+With these Python scripts you can see custom data via overlay (I set uptime, CPU temp). You can also see content of some file - for example weather forecast saved in TXT file.
+You can also take a photo, HDR photo and 15sec video. I want to add night photo in next update.
 
-![screenshot](https://github.com/vitasrutek/picamera-overlay/blob/main/screenshot.PNG)
+![screenshot](https://github.com/vitasrutek/picamera_2-overlay/blob/v2/files/screen.png))
 
-First of all you need picamera installed - https://picamera.readthedocs.io/en/release-1.13/install.html
-Then you have to install Lighttpd (but Nginx is probably better) and PHP.
-```
+```sh
+# update system and install software
 sudo apt update
-```
-```
 sudo apt install python3
-```
-```
-sudo apt install python3 nginx php-cgi php8.2-fpm
-```
-Next you should edit nginx config like this (add index.php, uncomment php stuff):
-```
-sudo nano /etc/nginx/sites-available/default
-```
-```
-server {
-  listen 80 default_server;
-  listen [::]:80 default_server;
-  root /var/www/html;
+sudo apt install -y python3-picamera2 --no-install-recommends
 
-  index index.php index.html index.htm index.nginx-debian.html;
+# clone repo
+git clone https://github.com/vitasrutek/picamera_2-overlay.git
 
-  server_name _;
+Edit all downloaded files to change absolute paths to GitHub cloned folder
 
-  location / {
-    try_files $uri $uri/ =404;
-  }
-
-  location ~ \.php$ {
-    include snippets/fastcgi-php.conf;
-    fastcgi_pass unix:/run/php/php8.1-fpm.sock;
-  }
-
-  location ~ /\.ht {
-    deny all;
-  }
-}
-```
-Create picamera service (name camera.service)
-```
-sudo nano /etc/systemd/system/camera.service
-```
-
-and add this (or copy prepared file):
-```
+# create service for PiCamera (picamera.py is from official repository picamera2 - mjpeg_server - only edited for rotation and resolution)
+sudo cat camera.service << 'EOF'
 [Unit]
 Description=Service for PiCamera
+After=network.targer
 
 [Service]
-ExecStart=python3 /home/pi/camera.py
+ExecStart=sudo python3 /home/pi/picamera.py
+User=pi
 
 [Install]
 WantedBy=multi-user.target
-```
-and activate service:
-```
-sudo systemctl enable camera.service
-sudo systemctl start camera.service
-```
-
-After these steps everything should be almost ready.
-Check service status for nginx and php8.2 and camera to be sure everything works fine.
-
-Next you must allow www-data user to run SUDO commands (stop and start camera.service for take static picture in full resolution)
-```
-sudo visudo
-```
-and add this
-```
-www-data   ALL=NOPASSWD: /var/www/html/photo-day.sh, /var/www/html/photo-night.sh
-```
+EOF
 
 
-After this you can now copy  all files to /var/www/html (photo*, index.php, temperature*, uptime.sh) and for .sh files make chmod +x.
+# create service for web overlay
+sudo cat web.service << 'EOF'
+[Unit]
+Description=Service for Web/Picamera
+After=network.target
 
-Note that to edit all nessecary files for IP address change.
+[Service]
+ExecStart=sudo python3 /home/pi/WEB/web.py
+WorkingDirectory=/home/pi/WEB
+User=pi
 
-Temperature shell files are for read values from CPU and from 1wire sensor. I could not resolve how to put commands directly to index.php so this is such a workaround.
+[Install]
+WantedBy=multi-user.target
+EOF
 
-Edit files and commands at will. Overlay text is defined in index.php.
+# set correct permissions
+sudo chmod -R 755 /path/to/downloaded/github/folder
+
+# make files executable
+cd /path/to/downloaded/github/folder/files
+chmod +x *.sh
+
+# enable and start services
+sudo systemctl daemon-reload
+sudo systemctl enable web.service camera.service
+sudo systemctl start web.service camera.service
+```
+
+
+Note that to edit all nessecary files for IP address and folder location change.
+
+Edit files and commands at will. Overlay text is defined in web.py.

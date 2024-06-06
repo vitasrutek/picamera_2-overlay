@@ -1,25 +1,26 @@
 #!/usr/bin/python3
 
 # This is the same as mjpeg_server.py, but uses the h/w MJPEG encoder.
-# This file is placed in /home/pi/
 
 import io
 import logging
 import socketserver
 from http import server
 from threading import Condition
+from libcamera import Transform
 
 from picamera2 import Picamera2
 from picamera2.encoders import MJPEGEncoder
 from picamera2.outputs import FileOutput
 
+PORT = 8000
+
 PAGE = """\
 <html>
 <head>
-<title>kamera</title>
 </head>
 <body>
-<img src="stream.mjpg" width="1440" height="1080" />
+<img src="stream.mjpg" width="1024" height="768" />
 </body>
 </html>
 """
@@ -80,15 +81,13 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     allow_reuse_address = True
     daemon_threads = True
 
-
 picam2 = Picamera2()
-picam2.configure(picam2.create_video_configuration(main={"size": (2048, 1536)}))
-# picam2.configure(picam2.create_video_configuration(main={"size": (1024, 768)}, transform=Transform(hflip = True, vflip = True)))
+picam2.configure(picam2.create_video_configuration(main={"size": (1024, 768)}, transform=Transform(hflip = True, vflip = True)))
 output = StreamingOutput()
 picam2.start_recording(MJPEGEncoder(), FileOutput(output))
 
 try:
-    address = ('', 8000)
+    address = ('', PORT)
     server = StreamingServer(address, StreamingHandler)
     server.serve_forever()
 finally:
