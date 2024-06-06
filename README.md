@@ -1,14 +1,16 @@
 # picamera_2-overlay
-overlay for live streaming from RaspberryPi camera on Bookworm.
+Text overlay for live streaming from RaspberryPi camera on Bookworm.
 
-# picamera-overlay
-Simple text (or whatever) overlay for picamera web stream (tested on Raspberry OS Bookworm (64bit) with libcamera on RaspberryPi)
-
-Now no need to use Nginx or Apache, everything is driven by Python :)
-With these Python scripts you can see custom data via overlay (I set uptime, CPU temp). You can also see content of some file - for example weather forecast saved in TXT file.
+### picamera2-overlay
+Simple text (or whatever) overlay for picamera web stream (tested on Raspberry OS Bookworm (64bit) with libcamera on RaspberryPi).
+   
+Now no need to use Nginx or Apache, everything is driven by Python :)   
+With these Python scripts you can see custom data via overlay (I set uptime, CPU temp). You can also see content of some file - for example weather forecast saved in TXT file.   
 You can also take a photo, HDR photo and 15sec video. I want to add night photo in next update.
 
-![screenshot](https://github.com/vitasrutek/picamera_2-overlay/blob/v2/files/screen.png))
+![screenshot](https://github.com/vitasrutek/picamera_2-overlay/blob/v2/files/screen.png)
+
+### Instalation
 
 ```sh
 # update system and install software
