@@ -1,4 +1,9 @@
-rm photo-day.jpg
+#!/bin/bash
+echo 'Mažu fotku'
+rm /home/pi/WEB/photo-day.jpg
+echo 'Vypínám službu'
 sudo systemctl stop camera.service
-python3 /var/www/html/picamera-jpeg.py
+echo 'Fotím'
+sudo -u pi libcamera-jpeg -o /home/pi/WEB/photo-day.jpg --rotation 180
+echo 'Zapínám službu'
 sudo systemctl start camera.service
