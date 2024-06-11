@@ -24,7 +24,7 @@ git clone https://github.com/vitasrutek/picamera_2-overlay.git
 Edit all downloaded files to change absolute paths to GitHub cloned folder
 
 # create service for PiCamera (picamera.py is from official repository picamera2 - mjpeg_server - only edited for rotation and resolution)
-sudo > cat camera.service <<'EOF'
+sudo cat > /etc/systemd/system/camera.service <<'EOF'
 [Unit]
 Description=Service for PiCamera
 After=network.targer
@@ -39,7 +39,7 @@ EOF
 
 
 # create service for web overlay
-sudo cat > web.service <<'EOF'
+sudo cat > /etc/systemd/system/web.service <<'EOF'
 [Unit]
 Description=Service for Web/Picamera
 After=network.target
