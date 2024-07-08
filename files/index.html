@@ -4,6 +4,7 @@
 .container {
   position: relative;
   font-family: Consolas;
+  max-width: 100%;
 }
 
 .text-block {
@@ -20,7 +21,7 @@
   display: inline;
   line-height: 0;
   letter-spacing: 2px;
-  width:  1014;
+  width:  1014px;
 }
 
 .button {
@@ -41,16 +42,18 @@
 </style>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live stream</title>
 </head>
 <body>
 <div class="container">
-    <img src="http://192.168.1.138:8000/stream.mjpg" width="1024" height="768" />
+    <img src="http://192.168.0.16:8000/stream.mjpg" width="1024" height="768" />
     <div class="text-block">
     <p>{{ file_content }},
-    {{ uptime }},
-    {{ temperature }}</p>
+    venku: {{ venku }}°C /
+    CPU: {{ temperature }} /
+    {{ uptime }}
+    </p>
 
 </div>
     <div class="button-container">
@@ -64,7 +67,7 @@
     <button type="submit" class="button">Video 15s</button>
     </form>
     <form action="/script_photo-night" method="post">
-    <button type="submit" class="button">N/A</button>
+    <button type="submit" class="button">Noc</button>
     </form>
     </div>
 </div>
