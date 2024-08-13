@@ -1,6 +1,10 @@
 # picamera_2-overlay
 Text overlay for live streaming from RaspberryPi camera on Bookworm.
 
+# Update 2024-08
+For Raspberry Pi Zero2 and Camera module V3 (Wide) is resolution quiet bigger -> higher CPU consumption -> higher temperature. Because of this is new web.py file where camera.service is disabled by default and start only on HTML page load. After interval camera.service is stopped. This means CPU and temperature saving.   
+For V1 cameras is web_old.py suitable enough.
+
 ### picamera2-overlay
 Simple text (or whatever) overlay for picamera web stream (tested on Raspberry OS Bookworm (64bit) with libcamera on RaspberryPi).
    
@@ -62,8 +66,8 @@ chmod +x *.sh
 
 # enable and start services
 sudo systemctl daemon-reload
-sudo systemctl enable web.service camera.service
-sudo systemctl start web.service camera.service
+sudo systemctl enable web.service ## camera.service -> do this for well cooled devices (not for Zero2 and V3 camera)
+sudo systemctl start web.service ## camera.service -> do this for well cooled devices (not for Zero2 and V3 camera)
 ```
 
 
