@@ -11,7 +11,7 @@ import time
 import sys
 
 PORT = 80
-SHUTDOWN_INTERVAL = 30
+SHUTDOWN_INTERVAL = 5
 
 service_timer = None
 service_started = False
