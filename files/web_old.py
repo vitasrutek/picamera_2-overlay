@@ -1,5 +1,7 @@
 #!/usr/bin/python3
-
+#
+#    for V1 cameras with lower resolution (5MPx)
+#
 import io
 import logging
 import socketserver
