@@ -44,6 +44,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live stream</title>
+    <script>
+        function fetchTemperature() {
+            fetch('/cpu_temp')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('cpu-temp').innerText = data.temperature + " °C";
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Aktualizace teploty každých 2 sekund
+        setInterval(fetchTemperature, 2000);
+
+        // Načtení teploty při načtení stránky
+        window.onload = fetchTemperature;
+    </script>  
 </head>
 <body>
 <div class="container">
@@ -51,7 +67,7 @@
     <div class="text-block">
     <p>{{ file_content }},
     venku: {{ venku }}°C /
-    CPU: {{ temperature }} /
+    CPU: <span id="cpu-temp">Načítání...</span> /
     {{ uptime }}
     </p>
 
