@@ -54,7 +54,13 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
 
     def do_GET(self):
         self.start_service()
-        if self.path == '/':
+        if self.path == '/cpu_temp':
+            temp = os.popen("vcgencmd measure_temp").readline().replace("temp=", "").replace("'C\n", "")
+            self.send_response(200)
+            self.send_header("Content-type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"temperature": temp}).encode())
+        elif self.path == '/':
             try:
                 file_content = read_file(content_file)
                 uptime = get_uptime()
@@ -71,7 +77,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
                 self.wfile.write(html_content.encode('utf-8'))
             except Exception as e:
                 self.send_error(500, f"Internal server error: {e}")
-        if self.path == '/index.html':
+        elif self.path == '/index.html':
             try:
                 file_content = read_file(content_file)
                 uptime = get_uptime()
