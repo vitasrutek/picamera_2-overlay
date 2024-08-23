@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+.container {
+  position: relative;
+  font-family: Consolas;
+  max-width: 100%;
+}
+
+.text-block {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background-color: black;
+  color: white;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  padding-left: 5px;
+  padding-right: 5px;
+  background: rgba(0, 0, 0, .5);
+  display: inline;
+  line-height: 0;
+  letter-spacing: 2px;
+  width:  1356px;
+}
+
+.button {
+    display: inline-block;
+    width: 150px;
+    margin: 0 10px;
+    text-align: center;
+    padding: 10px;
+    background-color:
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.button-container form {
+    display: inline-block; /* Formuláře budou vedle sebe */
+}
+</style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live stream</title>
+    <script>
+        function fetchTemperature() {
+            fetch('/cpu_temp')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('cpu-temp').innerText = data.temperature + " °C";
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        setInterval(fetchTemperature, 2000);
+        window.onload = fetchTemperature;
+    </script>
+</head>
+<body>
+<div class="container">
+    <img src="http://192.168.0.16:8000/stream.mjpg" width="1366" height="768" />
+    <div class="text-block">
+    <p>{{ file_content }},
+    venku: {{ venku }}°C /
+    CPU: <span id="cpu-temp">Načítání...</span> /
+    {{ uptime }}
+    </p>
+
+</div>
+    <div class="button-container">
+    <form action="/script_photo-day" method="post">
+    <button type="submit" class="button">Fotka</button>
+    </form>
+    <form action="/script_photo-hdr" method="post">
+    <button type="submit" class="button">Fotka HDR</button>
+    </form>
+    <form action="/script_video" method="post">
+    <button type="submit" class="button">Video 15s</button>
+    </form>
+    <form action="/script_photo-night" method="post">
+    <button type="submit" class="button">Noc</button>
+    </form>
+    </div>
+</div>
+</body>
+</html>
