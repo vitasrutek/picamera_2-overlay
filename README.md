@@ -1,6 +1,10 @@
 # picamera_2-overlay
 Text overlay for live streaming from RaspberryPi camera on Bookworm.
 
+# Update 2024-09 (almost)
+I just rewrite part of switching service. Now camera and web services are running, but camera.recording is only when WWW client is connected.   
+Add realtime CPU temperature update.
+
 # Update 2024-08
 For Raspberry Pi Zero2 and Camera module V3 (Wide) is resolution quiet bigger -> higher CPU consumption -> higher temperature. Because of this is new web.py file where camera.service is disabled by default and start only on HTML page load. After interval camera.service is stopped. This means CPU and temperature saving.   
 For V1 cameras is web_old.py suitable enough.
