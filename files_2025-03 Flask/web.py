@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_file, jsonify, redirect
+from flask import Flask, render_template, send_file, jsonify, redirect, request
 import subprocess
 import os
 
@@ -19,23 +19,17 @@ def get_temperature():
     temperature = temp_output.replace('temp=', '')
     return temperature
 
-# Získání venkovní teploty
-#def get_venku():
-#    result = subprocess.run(['/usr/bin/bash', '/home/vita/WEB/teplota.sh'], stdout=subprocess.PIPE, text=True)
-#    #return result.stdout.strip()
-#    return outtemperature
-
+# Získání venkovní teploty (DS18B20)
 def get_venku():
     try:
         with open('/sys/bus/w1/devices/28-011919dc4f67/w1_slave', 'r') as file:
             tempread = file.read()
-            # Extrahování teploty z textového výstupu
             temperature_str = tempread.split('t=')[-1]
-            # Vypočítání teploty v °C
             temperature = float(temperature_str) / 1000.0
-            return f"{temperature:.2f}"  # Vrátí teplotu jako řetězec s dvěma desetinnými místy
+            return f"{temperature:.2f}"
     except Exception as e:
         return f"Error reading temperature: {e}"
+
 # Získání uptime
 def get_uptime():
     result = subprocess.run(['uptime', '-p'], stdout=subprocess.PIPE, text=True)
@@ -49,8 +43,8 @@ def index():
 
 @app.route('/out_temp')
 def out_temp():
-    outtemp = get_venku()  # Získání venkovní teploty
-    return jsonify({"outtemperature": outtemp})  # Vrátí jako JSON
+    outtemp = get_venku()
+    return jsonify({"outtemperature": outtemp})
 
 @app.route('/cpu_temp')
 def cpu_temp():
@@ -66,13 +60,25 @@ def serve_photo(name):
 def serve_video():
     return send_file('/home/vita/WEB/video.mp4', mimetype='video/mp4')
 
+# POST verze pro tlačítka
 @app.route('/script_photo-<name>', methods=['POST'])
-def run_script(name):
+def run_script_post(name):
     try:
         result = subprocess.run(['/usr/bin/sudo', f'/home/vita/WEB/photo-{name}.sh'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if result.returncode != 0:
             return f'Error running script: {result.stderr}', 500
         return redirect(f'/photo-{name}.jpg')
+    except Exception as e:
+        return f'Internal server error: {e}', 500
+
+# GET verze pro zadání do adresního řádku
+@app.route('/script_photo-<name>', methods=['GET'])
+def run_script_get(name):
+    try:
+        result = subprocess.run(['/usr/bin/sudo', f'/home/vita/WEB/photo-{name}.sh'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        if result.returncode != 0:
+            return f'Error running script: {result.stderr}', 500
+        return send_file(f'/home/vita/WEB/photo-{name}.jpg', mimetype='image/jpeg')
     except Exception as e:
         return f'Internal server error: {e}', 500
 
